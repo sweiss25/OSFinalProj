@@ -16,7 +16,6 @@ public class Main {
 		client1.requestSlave();
 		client2.requestSlave();
 		client3.requestSlave();
-
+		//test adding to github
 	}
-
 }
