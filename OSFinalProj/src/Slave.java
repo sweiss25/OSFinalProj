@@ -1,3 +1,4 @@
+//each time a client connects, increment counter
 
 import java.io.*;
 import java.net.*;

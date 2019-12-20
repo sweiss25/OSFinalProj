@@ -1,3 +1,5 @@
+//rearrange port situation, client has to connect to slave port
+
 import java.io.*;
 import java.net.*;
 
@@ -5,7 +7,7 @@ public class Client {
     public static void main(String[] args) throws IOException {
         
 		// Hardcode in IP and Port here if required
-    	args = new String[] {"127.0.0.1", "30121"};
+    	args = new String[] {"127.0.0.1", "30122"};
     	
         if (args.length != 2) {
             System.err.println(

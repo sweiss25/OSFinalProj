@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class MasterThread implements Runnable {
+	
 	static ArrayList<Slave> slaves = new ArrayList<Slave>();
 	static Random globalRnd = new Random();
 	Random localRnd = new Random(globalRnd.nextLong());
