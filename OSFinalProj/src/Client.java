@@ -1,9 +1,10 @@
 import java.io.*;
 import java.net.*;
 
-public class Client extends Thread {
-    @Override
-	public void run() {
+public class Client {
+    
+	public static void main(String[] args) {
+		
     	try (Socket clientSocket = new Socket("127.0.0.1", 5000);		//open up communication with Master
     			PrintWriter writeToMaster = new PrintWriter(clientSocket.getOutputStream(), true);
     			BufferedReader readFromMaster = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {
