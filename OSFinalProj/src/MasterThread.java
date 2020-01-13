@@ -4,10 +4,10 @@ import java.util.*;
 
 public class MasterThread extends Thread{
 	
-	static ArrayList<Slave> slaves = new ArrayList<Slave>();
+	public static final ArrayList<String> portNumbers = new ArrayList<>();
 	
 	// A reference to the server socket is passed in, all threads share it
-	private ServerSocket masterSocket = null;
+	private ServerSocket masterSocket = null; 
 	int id; 
 	public MasterThread(ServerSocket ms, int id)
 	{
@@ -18,35 +18,61 @@ public class MasterThread extends Thread{
 	@Override
 	public void run() {
 		
-		//allow a client to connect to a master thread 
-		try (Socket clientSocket = masterSocket.accept();		
-				PrintWriter writeToClient = new PrintWriter(clientSocket.getOutputStream(), true);
-				BufferedReader readFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {
-		
-			String clientRequest;
-			while ((clientRequest = readFromClient.readLine()) != null) {	//receive client request
-				System.out.println("Job received from client: " + clientRequest);	
-				int slavePort = findAvailable(slaves);		
-				System.out.println("Master sent port #" + slavePort);
-				writeToClient.println(String.valueOf(slavePort));		//send client the port number for the next available slave
+		//slave or client opens up communication with Master
+		try (Socket slaveSocket = masterSocket.accept();		
+				PrintWriter writeToClient = new PrintWriter(slaveSocket.getOutputStream(), true);
+				BufferedReader readFromClient = new BufferedReader(new InputStreamReader(slaveSocket.getInputStream()));) {
+			
+			String read;	//variable to hold value read in from slave/client
+			
+			//assign type based on whether a client or slave has written in
+			String type; 	
+			if((read = readFromClient.readLine()).equals("I'm a client")) {
+				type = "client";
+			} else {
+				type = "slave";
 			}
+			
+			//if type is slave, master reads in slaves port number and adds it to the list of slaves
+			String portNumber;
+			if (read != null && type.equals("slave")) {
+				portNumber = read;
+				System.out.println(portNumber + " received by listener: " + id);	//receive port number from slave
+				portNumbers.add(portNumber);
+			}
+			
+			//if type is client, master finds the next available slave and sends its port number to the client
+			String job;
+			if (read != null && type.equals("client")) {
+				job = read;
+				System.out.println("client says: " + job);
+				
+				String availablePort = findAvailable(portNumbers);		//find slave with fewest current connections
+				
+				writeToClient.println(availablePort);
+				System.out.println("port sent to client: " + availablePort);
+
+			}
+			
 		} catch (IOException e) {
 			System.out.println(
 					"Exception caught when trying to listen on port 5000 or listening for a connection");
 			System.out.println(e.getMessage());
 		}
+		
+		
 	}
 	
-	public static int findAvailable(ArrayList<Slave> slaves) {
-
-		Slave current = slaves.get(0); // initialize current to first slave in list
-
-		// loop through to find the slave with the fewest connections
-		for (int i = 0; i < slaves.size(); i++) {
-			if (slaves.get(i).getCounter() < current.getCounter()) {
+	//method to find the slave with the fewest current connections
+	public static String findAvailable(ArrayList<String> portNumbers) {
+		/*
+		String current = portNumbers.get(0);
+		for (int i = 0; i < portNumbers.size(); i++) {
+			if (portNumbers < current) {
 				current = slaves.get(i);
 			}
 		}
-		return current.getPort();
+		*/
+		return portNumbers.get(0);
 	}
 }
