@@ -17,8 +17,11 @@ public class Slave {
     		
     		//slave sends its port number to master
     		System.out.println("writing to master");
-    		writeToMaster.println(portNum);		
+    		writeToMaster.println(portNum);	
     		
+    		boolean go = true;
+    		while(go) {
+    			
     		//client opens up communication with slave
     		try (ServerSocket slaveToClientSocket = new ServerSocket(portNum);		
     				Socket clientSocket = slaveToClientSocket.accept();	
@@ -33,14 +36,19 @@ public class Slave {
     			
     				//slave sends back client's statement in capital letters
     				System.out.println("slave responding to client");
-    				writeToClient.println(clientRequest.toUpperCase());		
+    				writeToClient.println(clientRequest.toUpperCase());	
     			}
+    			
     		
     		} catch (IOException e) {
     			System.out.println(
     					"Exception caught when trying to listen on port " + portNum + " or listening for a connection");
     			System.out.println(e.getMessage());
     		}
+    		}
+    		
+    		writeToMaster.println("Finished job for client");
+			writeToMaster.println(portNum);
     		
     	} catch (UnknownHostException e) {
             System.err.println("Don't know about host 127.0.0.1");
